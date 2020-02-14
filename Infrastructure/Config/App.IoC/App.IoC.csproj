@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EZNEW.VerificationCode.SkiaSharp" Version="1.0.1" />
+    <PackageReference Include="EZNEW.Web" Version="2.1.11" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Modules\Sys\Business\Domain\EZNEW.Domain.Sys\EZNEW.Domain.Sys.csproj" />
+  </ItemGroup>
+
+</Project>

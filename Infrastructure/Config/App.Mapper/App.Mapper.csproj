@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="EZNEW.DataValidation.Config" Version="1.0.1" />
+    <PackageReference Include="EZNEW.Mvc.CustomModelDisplayName" Version="1.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Modules\Sys\Config\EZNEW.ModuleConfig.Sys\EZNEW.ModuleConfig.Sys.csproj" />
+  </ItemGroup>
+
+</Project>

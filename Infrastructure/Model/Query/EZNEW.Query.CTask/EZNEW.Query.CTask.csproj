@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Framework\CTask\EZNEW.CTask\EZNEW.CTask.csproj" />
+    <ProjectReference Include="..\..\..\..\Framework\Dev\EZNEW.Develop\EZNEW.Develop.csproj" />
+    <ProjectReference Include="..\..\Entity\EZNEW.Entity.CTask\EZNEW.Entity.CTask.csproj" />
+  </ItemGroup>
+
+</Project>
