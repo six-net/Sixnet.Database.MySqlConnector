@@ -1,6 +1,17 @@
 # Demo.Core2.2
 
-an example application for the EZNEW.NET development framework
+An example application for the EZNEW.NET development framework
+
+# Get Started
+
+1. Download and install [.NetCore2.2 SDK](https://dotnet.microsoft.com/download/dotnet-core/2.2)
+2. Download and install [Visual Studio 2019](https://visualstudio.microsoft.com/zh-hans/downloads/)
+3. If you can't access nuget.org,you can use this nuget package source:<b>http://nuget.eznew.net/nuget</b>
+3. Clone or download project
+4. [Download database script](https://github.com/eznew-net/Demo.File/tree/master/DataBase) and create database
+5. Config database connection in <b>appsettings.json</b> file
+6. Build and run <b>Site.Console</b> 
+7. Login by default <b>UserName:admin</b> and default <b>Passwork:admin</b>
 
 # Reporting issues and bugs
 
