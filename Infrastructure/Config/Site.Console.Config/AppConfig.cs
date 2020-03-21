@@ -14,21 +14,8 @@ namespace Site.Console.Config
     {
         public static void Init()
         {
-
-            #region 功能模块配置
-
-            Action<IMapperConfigurationExpression> configuration = null;
-
-            #region Sys
-
-            SysModuleConfig.Init(ref configuration);
-
-            #endregion
-
-            #endregion
-
             //对象转换映射
-            ObjectMapManager.ObjectMapper = MapperFactory.CreateMapper(configuration);
+            MapperFactory.CreateMapper();
 
             //数据库配置
             DbConfig.Init();
