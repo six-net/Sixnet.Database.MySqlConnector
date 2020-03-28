@@ -29,10 +29,7 @@ namespace Site.Console.Config
         /// </summary>
         static void DataValidationConfig()
         {
-            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.dvconfig", new EnumerationOptions()
-            {
-                RecurseSubdirectories = true
-            });
+            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.dvconfig", SearchOption.AllDirectories);
             ValidationConfig.InitFromConfigFile(files);
         }
 
@@ -45,10 +42,7 @@ namespace Site.Console.Config
         /// </summary>
         static void DisplayNameConfig()
         {
-            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.disconfig", new EnumerationOptions()
-            {
-                RecurseSubdirectories = true
-            });
+            var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.disconfig", SearchOption.AllDirectories);
             DisplayConfig.InitFromFiles(files);
         }
 
