@@ -13,7 +13,6 @@ using EZNEW.Application.Identity.User;
 using EZNEW.Application.Identity;
 using EZNEW.Framework.Code;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using EZNEW.Domain.Sys.Service;
 using EZNEW.Framework.IoC;
 
@@ -27,56 +26,6 @@ namespace EZNEW.Domain.Sys.Model
         IRoleService roleService = ContainerManager.Resolve<IRoleService>();
 
         #region	字段
-
-        /// <summary>
-        /// 用户编号
-        /// </summary>
-        protected long sysNo;
-
-        /// <summary>
-        /// 用户名
-        /// </summary>
-        protected string userName;
-
-        /// <summary>
-        /// 真实名称
-        /// </summary>
-        protected string realName;
-
-        /// <summary>
-        /// 密码
-        /// </summary>
-        protected string pwd;
-
-        /// <summary>
-        /// 类型
-        /// </summary>
-        protected UserType userType;
-
-        /// <summary>
-        /// 超级用户
-        /// </summary>
-        protected bool superUser = false;
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        protected UserStatus status;
-
-        /// <summary>
-        /// 联系方式
-        /// </summary>
-        protected Contact contact;
-
-        /// <summary>
-        /// 添加时间
-        /// </summary>
-        protected DateTime createDate;
-
-        /// <summary>
-        /// 最近登录时间
-        /// </summary>
-        protected DateTime lastLoginDate;
 
         #endregion
 
@@ -99,14 +48,8 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public long SysNo
         {
-            get
-            {
-                return sysNo;
-            }
-            protected set
-            {
-                sysNo = value;
-            }
+            get;
+            protected set;
         }
 
         /// <summary>
@@ -114,14 +57,7 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public string UserName
         {
-            get
-            {
-                return userName;
-            }
-            set
-            {
-                userName = value;
-            }
+            get; set;
         }
 
         /// <summary>
@@ -129,14 +65,7 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public string RealName
         {
-            get
-            {
-                return realName;
-            }
-            set
-            {
-                realName = value;
-            }
+            get; set;
         }
 
         /// <summary>
@@ -144,14 +73,8 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public string Pwd
         {
-            get
-            {
-                return pwd;
-            }
-            protected set
-            {
-                pwd = value;
-            }
+            get;
+            protected set;
         }
 
         /// <summary>
@@ -159,29 +82,17 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public UserType UserType
         {
-            get
-            {
-                return userType;
-            }
-            protected set
-            {
-                userType = value;
-            }
-        }
+            get;
+            protected set;
+        } = UserType.管理账户;
 
         /// <summary>
         /// 超级用户
         /// </summary>
         public bool SuperUser
         {
-            get
-            {
-                return superUser;
-            }
-            protected set
-            {
-                superUser = value;
-            }
+            get;
+            protected set;
         }
 
         /// <summary>
@@ -189,14 +100,7 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public UserStatus Status
         {
-            get
-            {
-                return status;
-            }
-            set
-            {
-                status = value;
-            }
+            get; set;
         }
 
         /// <summary>
@@ -204,8 +108,7 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public Contact Contact
         {
-            get { return contact; }
-            set { contact = value; }
+            get; set;
         }
 
         /// <summary>
@@ -213,30 +116,18 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public DateTime CreateDate
         {
-            get
-            {
-                return createDate;
-            }
-            protected set
-            {
-                createDate = value;
-            }
-        }
+            get;
+            protected set;
+        } = DateTime.Now;
 
         /// <summary>
         /// 最近登录时间
         /// </summary>
         public DateTime LastLoginDate
         {
-            get
-            {
-                return lastLoginDate;
-            }
-            protected set
-            {
-                lastLoginDate = value;
-            }
-        }
+            get;
+            protected set;
+        } = DateTime.Now;
 
         #endregion
 
@@ -281,7 +172,7 @@ namespace EZNEW.Domain.Sys.Model
         /// <returns></returns>
         public bool AllowLogin()
         {
-            return superUser || status == UserStatus.正常;
+            return SuperUser || Status == UserStatus.正常;
         }
 
         #endregion
@@ -294,7 +185,7 @@ namespace EZNEW.Domain.Sys.Model
         public override void InitIdentityValue()
         {
             base.InitIdentityValue();
-            sysNo = GenerateUserId();
+            SysNo = GenerateUserId();
         }
 
         #endregion
@@ -329,7 +220,7 @@ namespace EZNEW.Domain.Sys.Model
         /// <param name="newPwd">新的密码</param>
         void SetPassword(string newPwd)
         {
-            pwd = PasswordEncryption(newPwd);
+            Pwd = PasswordEncryption(newPwd);
         }
 
         #endregion
@@ -341,9 +232,6 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         protected void Initialization()
         {
-            createDate = DateTime.Now;
-            lastLoginDate = DateTime.Now;
-            status = UserStatus.正常;
             repository = this.Instance<IUserRepository>();
         }
 
@@ -357,7 +245,7 @@ namespace EZNEW.Domain.Sys.Model
         /// <returns></returns>
         public override bool IdentityValueIsNone()
         {
-            return sysNo <= 0;
+            return SysNo <= 0;
         }
 
         #endregion

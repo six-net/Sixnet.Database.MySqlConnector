@@ -13,7 +13,6 @@ using EZNEW.Framework;
 using EZNEW.Application.Identity.User;
 using EZNEW.Application.Identity;
 using EZNEW.Framework.Code;
-using Newtonsoft.Json;
 using EZNEW.Develop.Command.Modify;
 
 namespace EZNEW.Domain.Sys.Model
@@ -26,44 +25,9 @@ namespace EZNEW.Domain.Sys.Model
         #region	字段
 
         /// <summary>
-        /// 角色编号
-        /// </summary>
-        protected long sysNo;
-
-        /// <summary>
-        /// 名称
-        /// </summary>
-        protected string name;
-
-        /// <summary>
-        /// 等级
-        /// </summary>
-        protected int level;
-
-        /// <summary>
         /// 上级
         /// </summary>
         protected LazyMember<Role> parent;
-
-        /// <summary>
-        /// 排序
-        /// </summary>
-        protected int sort;
-
-        /// <summary>
-        /// 状态
-        /// </summary>
-        protected RoleStatus status;
-
-        /// <summary>
-        /// 添加时间
-        /// </summary>
-        protected DateTime createDate;
-
-        /// <summary>
-        /// 备注信息
-        /// </summary>
-        protected string remark;
 
         #endregion
 
@@ -86,14 +50,8 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public long SysNo
         {
-            get
-            {
-                return sysNo;
-            }
-            protected set
-            {
-                sysNo = value;
-            }
+            get;
+            protected set;
         }
 
         /// <summary>
@@ -101,14 +59,7 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public string Name
         {
-            get
-            {
-                return name;
-            }
-            set
-            {
-                name = value;
-            }
+            get; set;
         }
 
         /// <summary>
@@ -116,14 +67,8 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public int Level
         {
-            get
-            {
-                return level;
-            }
-            protected set
-            {
-                level = value;
-            }
+            get;
+            protected set;
         }
 
         /// <summary>
@@ -146,14 +91,8 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public int Sort
         {
-            get
-            {
-                return sort;
-            }
-            protected set
-            {
-                sort = value;
-            }
+            get;
+            protected set;
         }
 
         /// <summary>
@@ -161,44 +100,23 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public RoleStatus Status
         {
-            get
-            {
-                return status;
-            }
-            set
-            {
-                status = value;
-            }
-        }
+            get; set;
+        } = RoleStatus.正常;
 
         /// <summary>
         /// 添加时间
         /// </summary>
         public DateTime CreateDate
         {
-            get
-            {
-                return createDate;
-            }
-            set
-            {
-                createDate = value;
-            }
-        }
+            get; set;
+        } = DateTime.Now;
 
         /// <summary>
         /// 备注信息
         /// </summary>
         public string Remark
         {
-            get
-            {
-                return remark;
-            }
-            set
-            {
-                remark = value;
-            }
+            get; set;
         }
 
         #endregion
@@ -222,7 +140,7 @@ namespace EZNEW.Domain.Sys.Model
                 parentLevel = parentRole.Level;
                 parentSysNo = parentRole.SysNo;
             }
-            if (parentSysNo == sysNo && !IdentityValueIsNone())
+            if (parentSysNo == SysNo && !IdentityValueIsNone())
             {
                 throw new Exception("不能将角色本身设置为自己的上级角色");
             }
@@ -230,12 +148,12 @@ namespace EZNEW.Domain.Sys.Model
             IQuery sortQuery = QueryFactory.Create<RoleQuery>(r => r.Parent == parentSysNo);
             sortQuery.AddQueryFields<RoleQuery>(c => c.Sort);
             int maxSortIndex = repository.Max<int>(sortQuery);
-            sort = maxSortIndex + 1;
+            Sort = maxSortIndex + 1;
             parent.SetValue(parentRole, true);
             //等级
             int newLevel = parentLevel + 1;
-            bool modifyChild = newLevel != level;
-            level = newLevel;
+            bool modifyChild = newLevel != Level;
+            Level = newLevel;
             if (modifyChild)
             {
                 //修改所有子集信息
@@ -257,7 +175,7 @@ namespace EZNEW.Domain.Sys.Model
             {
                 throw new Exception("请填写正确的角色排序");
             }
-            sort = newSort;
+            Sort = newSort;
             //其它角色顺延
             IQuery sortQuery = QueryFactory.Create<RoleQuery>(r => r.Parent == (parent.CurrentValue == null ? 0 : parent.CurrentValue.SysNo) && r.Sort >= newSort);
             IModify modifyExpression = ModifyFactory.Create();
@@ -275,7 +193,7 @@ namespace EZNEW.Domain.Sys.Model
         public override void InitIdentityValue()
         {
             base.InitIdentityValue();
-            sysNo = GenerateRoleId();
+            SysNo = GenerateRoleId();
         }
 
         #endregion
@@ -291,8 +209,6 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         void Initialization()
         {
-            createDate = DateTime.Now;
-            status = RoleStatus.正常;
             parent = new LazyMember<Role>(LoadParentRole);
             repository = this.Instance<IRoleRepository>();
         }
@@ -311,7 +227,7 @@ namespace EZNEW.Domain.Sys.Model
             {
                 return parent.CurrentValue;
             }
-            if (level <= 1 || parent.CurrentValue == null)
+            if (Level <= 1 || parent.CurrentValue == null)
             {
                 return null;
             }
@@ -350,7 +266,7 @@ namespace EZNEW.Domain.Sys.Model
         /// <returns></returns>
         public override bool IdentityValueIsNone()
         {
-            return sysNo <= 0;
+            return SysNo <= 0;
         }
 
         #endregion
