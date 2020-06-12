@@ -4,7 +4,7 @@ An example application for the EZNEW.NET development framework
 
 # Get Started
 
-1. Download and install [.NetCore3.0 SDK](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+1. Download and install [.NetCore2.2 SDK](https://dotnet.microsoft.com/download/dotnet-core/2.2)
 2. Download and install [Visual Studio 2019](https://visualstudio.microsoft.com/zh-hans/downloads/)
 3. If you can't access nuget.org,you can use this nuget package source:<b>http://nuget.eznew.net/nuget</b>
 3. Clone or download project
