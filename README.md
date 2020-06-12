@@ -1,6 +1,6 @@
 # Demo.Core3.0
 
-An example application for the EZNEW.NET development framework
+An example application for the EZNEW development framework
 
 # Get Started
 
