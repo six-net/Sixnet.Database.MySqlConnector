@@ -1,13 +1,11 @@
 using System;
 using EZNEW.Develop.Domain.Aggregation;
-using EZNEW.Framework.Extension;
 using EZNEW.Domain.Sys.Repository;
-using EZNEW.Develop.CQuery;
 using EZNEW.Query.Sys;
-using EZNEW.Framework.ValueType;
-using EZNEW.Application.Identity.Auth;
-using System.Threading.Tasks;
-using EZNEW.Framework.Code;
+using EZNEW.ValueType;
+using EZNEW.Module.Sys;
+using EZNEW.Develop.CQuery;
+using EZNEW.Code;
 
 namespace EZNEW.Domain.Sys.Model
 {
@@ -143,7 +141,7 @@ namespace EZNEW.Domain.Sys.Model
         /// </summary>
         public override void InitIdentityValue()
         {
-            SysNo = SerialNumber.GetSerialNumber(((int)EZNEW.Application.Identity.IdentityGroup.权限).ToString());
+            SysNo = SysManager.GetId(SysModuleObject.Authority);
         }
 
         #endregion
@@ -168,7 +166,7 @@ namespace EZNEW.Domain.Sys.Model
             {
                 return group.CurrentValue;
             }
-            return this.Instance<IAuthorityGroupRepository>().Get(QueryFactory.Create<AuthorityGroupQuery>(r => r.SysNo == group.CurrentValue.SysNo));
+            return this.Instance<IAuthorityGroupRepository>().Get(QueryManager.Create<AuthorityGroupQuery>(r => r.SysNo == group.CurrentValue.SysNo));
         }
 
         #endregion

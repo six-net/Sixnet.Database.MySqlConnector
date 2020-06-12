@@ -5,10 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EZNEW.Application.Identity" Version="1.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\EZNEW.Module.Sys\EZNEW.Module.Sys.csproj" />
     <ProjectReference Include="..\EZNEW.Entity.Sys\EZNEW.Entity.Sys.csproj" />
   </ItemGroup>
 

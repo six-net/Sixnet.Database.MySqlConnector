@@ -1,4 +1,4 @@
-using EZNEW.Framework.Paging;
+using EZNEW.Paging;
 using System;
 using System.Collections.Generic;
 using System.Linq;

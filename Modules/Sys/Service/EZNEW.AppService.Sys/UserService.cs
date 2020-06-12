@@ -7,9 +7,9 @@ using EZNEW.BusinessContract.Sys;
 using EZNEW.DTO.Sys.Query;
 using EZNEW.DTO.Sys.Cmd;
 using EZNEW.DTO.Sys.Query.Filter;
-using EZNEW.Framework.Paging;
+using EZNEW.Paging;
 using EZNEW.AppServiceContract.Sys;
-using EZNEW.Framework.Response;
+using EZNEW.Response;
 
 namespace EZNEW.AppService.Sys
 {

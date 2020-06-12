@@ -1,9 +1,9 @@
-using EZNEW.Framework.Paging;
+using EZNEW.Paging;
 using EZNEW.DTO.Sys.Cmd;
 using EZNEW.DTO.Sys.Query;
 using EZNEW.DTO.Sys.Query.Filter;
 using System.Collections.Generic;
-using EZNEW.Framework.Response;
+using EZNEW.Response;
 
 namespace EZNEW.AppServiceContract.Sys
 {

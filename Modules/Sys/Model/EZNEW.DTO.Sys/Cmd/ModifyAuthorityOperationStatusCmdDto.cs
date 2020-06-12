@@ -1,9 +1,5 @@
-using EZNEW.Application.Identity.Auth;
-using System;
+using EZNEW.Module.Sys;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EZNEW.DTO.Sys.Cmd
 {

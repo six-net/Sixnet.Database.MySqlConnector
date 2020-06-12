@@ -1,5 +1,5 @@
-using EZNEW.Application.Identity.Auth;
-using EZNEW.Framework.Paging;
+using EZNEW.Module.Sys;
+using EZNEW.Paging;
 using System;
 using System.Collections.Generic;
 using System.Linq;

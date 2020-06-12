@@ -8,8 +8,8 @@ using EZNEW.BusinessContract.Sys;
 using EZNEW.DTO.Sys.Query;
 using EZNEW.DTO.Sys.Cmd;
 using EZNEW.DTO.Sys.Query.Filter;
-using EZNEW.Framework.Response;
-using EZNEW.Framework.Paging;
+using EZNEW.Response;
+using EZNEW.Paging;
 
 namespace EZNEW.AppService.Sys
 {

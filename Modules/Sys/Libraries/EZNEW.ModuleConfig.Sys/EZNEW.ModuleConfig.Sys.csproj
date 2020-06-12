@@ -6,9 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="EZNEW.Cache" Version="1.1.3" />
-    <PackageReference Include="EZNEW.Data" Version="2.2.0" />
-    <PackageReference Include="EZNEW.Develop" Version="3.2.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,6 +24,45 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="ConfigFile\Sys\Display\EditAuthorityGroupViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ConfigFile\Sys\Display\EditAuthorityOperationGroupViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ConfigFile\Sys\Display\EditAuthorityOperationViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ConfigFile\Sys\Display\EditAuthorityViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ConfigFile\Sys\Display\EditRoleViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ConfigFile\Sys\Display\EditUserViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ConfigFile\Sys\Display\EditAuthorityGroupViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Display\EditAuthorityOperationGroupViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Display\EditAuthorityOperationViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Display\EditAuthorityViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Display\EditRoleViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Display\EditUserViewModel.disconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ConfigFile\Sys\Display\EditAuthorityGroupViewModel.disconfig">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -71,6 +107,33 @@
     </None>
     <None Update="ConfigFile\Sys\Validation\Role.dvconfig">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Validation\EditAuthorityGroupViewModel.dvconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Validation\EditAuthorityOperationGroupViewModel.dvconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Validation\EditAuthorityOperationViewModel.dvconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Validation\EditAuthorityViewModel.dvconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Validation\EditRoleViewModel.dvconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Validation\EditUserViewModel.dvconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Validation\LoginViewModel.dvconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Validation\ModifyPasswordViewModel.dvconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ConfigFile\Sys\Validation\Role.dvconfig">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

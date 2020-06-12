@@ -1,5 +1,5 @@
 using EZNEW.Develop.CQuery;
-using EZNEW.Framework.Paging;
+using EZNEW.Paging;
 using EZNEW.Develop.Domain.Repository;
 using EZNEW.Domain.Sys.Model;
 using System;

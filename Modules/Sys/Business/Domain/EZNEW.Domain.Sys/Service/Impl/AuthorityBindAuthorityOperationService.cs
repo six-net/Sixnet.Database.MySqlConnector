@@ -1,15 +1,9 @@
+using System.Collections.Generic;
+using EZNEW.Response;
+using EZNEW.Develop.UnitOfWork;
 using EZNEW.Domain.Sys.Repository;
 using EZNEW.Domain.Sys.Service.Param;
-using EZNEW.Framework;
-using EZNEW.Framework.IoC;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EZNEW.Framework.Extension;
-using EZNEW.Framework.Response;
-using EZNEW.Develop.UnitOfWork;
+using EZNEW.DependencyInjection;
 
 namespace EZNEW.Domain.Sys.Service.Impl
 {

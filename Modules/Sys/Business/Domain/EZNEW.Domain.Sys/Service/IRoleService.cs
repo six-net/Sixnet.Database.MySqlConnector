@@ -1,7 +1,7 @@
 ﻿using EZNEW.Develop.CQuery;
 using EZNEW.Domain.Sys.Model;
-using EZNEW.Framework.Paging;
-using EZNEW.Framework.Response;
+using EZNEW.Paging;
+using EZNEW.Response;
 using System;
 using System.Collections.Generic;
 using System.Text;
