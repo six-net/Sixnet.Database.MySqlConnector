@@ -1,4 +1,4 @@
-# Demo.Core3.0
+# Demo.Core2.2
 
 An example application for the EZNEW development framework
 
