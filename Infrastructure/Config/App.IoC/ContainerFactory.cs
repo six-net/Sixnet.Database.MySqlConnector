@@ -1,9 +1,9 @@
+using System;
+using Microsoft.Extensions.DependencyInjection;
 using EZNEW.DependencyInjection;
 using EZNEW.Drawing.VerificationCode;
 using EZNEW.VerificationCode.SkiaSharp;
 using EZNEW.Web.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace App.IoC
 {
@@ -16,7 +16,7 @@ namespace App.IoC
 
         public static void RegisterServices(IServiceCollection services)
         {
-            ContainerManager.Init(services, serviceRegisterAction: RegisterServices);
+            ContainerManager.Init(services, configureServiceAction: RegisterServices);
         }
 
         /// <summary>
