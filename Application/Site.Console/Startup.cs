@@ -1,6 +1,5 @@
 using System;
-using App.IoC;
-using EZNEW.Logging;
+using AppConfig.IoC;
 using EZNEW.Web.Mvc;
 using EZNEW.Web.Mvc.Display;
 using EZNEW.Web.Mvc.Validation;
@@ -88,7 +87,7 @@ namespace Site.Console
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-            AppConfig.Init();
+            SiteConfig.Init();
         }
     }
 }

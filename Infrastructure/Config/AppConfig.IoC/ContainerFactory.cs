@@ -5,7 +5,7 @@ using EZNEW.Drawing.VerificationCode;
 using EZNEW.VerificationCode.SkiaSharp;
 using EZNEW.Web.DependencyInjection;
 
-namespace App.IoC
+namespace AppConfig.IoC
 {
     public static class ContainerFactory
     {

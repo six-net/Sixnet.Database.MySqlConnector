@@ -4,7 +4,7 @@ using EZNEW.Data.SqlServer;
 using EZNEW.Data;
 using EZNEW.DependencyInjection;
 
-namespace App.Database
+namespace AppConfig.Database
 {
     /// <summary>
     /// 数据库配置
