@@ -13,43 +13,23 @@ namespace EZNEW.Entity.Sys
     public class RoleEntity : BaseEntity<RoleEntity>
     {
         /// <summary>
+        /// 角色编号
+        /// </summary>
+        [EntityField(Description = "角色编号", PrimaryKey = true)]
+        public long Id
+        {
+            get => GetPropertyValue<long>(nameof(Id));
+            set => SetPropertyValue(nameof(Id), value);
+        }
+
+        /// <summary>
         /// 名称
         /// </summary>
         [EntityField(Description = "名称")]
         public string Name
         {
-            get { return valueDict.GetValue<string>("Name"); }
-            set { valueDict.SetValue("Name", value); }
-        }
-
-        /// <summary>
-        /// 等级
-        /// </summary>
-        [EntityField(Description = "等级")]
-        public int Level
-        {
-            get { return valueDict.GetValue<int>("Level"); }
-            set { valueDict.SetValue("Level", value); }
-        }
-
-        /// <summary>
-        /// 上级
-        /// </summary>
-        [EntityField(Description = "上级")]
-        public long Parent
-        {
-            get { return valueDict.GetValue<long>("Parent"); }
-            set { valueDict.SetValue("Parent", value); }
-        }
-
-        /// <summary>
-        /// 排序
-        /// </summary>
-        [EntityField(Description = "排序")]
-        public int Sort
-        {
-            get { return valueDict.GetValue<int>("Sort"); }
-            set { valueDict.SetValue("Sort", value); }
+            get => GetPropertyValue<string>(nameof(Name));
+            set => SetPropertyValue(nameof(Name), value);
         }
 
         /// <summary>
@@ -58,8 +38,8 @@ namespace EZNEW.Entity.Sys
         [EntityField(Description = "状态")]
         public RoleStatus Status
         {
-            get { return valueDict.GetValue<RoleStatus>("Status"); }
-            set { valueDict.SetValue("Status", value); }
+            get => GetPropertyValue<RoleStatus>(nameof(Status));
+            set => SetPropertyValue(nameof(Status), value);
         }
 
         /// <summary>
@@ -68,8 +48,8 @@ namespace EZNEW.Entity.Sys
         [EntityField(Description = "添加时间")]
         public DateTime CreateDate
         {
-            get { return valueDict.GetValue<DateTime>("CreateDate"); }
-            set { valueDict.SetValue("CreateDate", value); }
+            get => GetPropertyValue<DateTime>(nameof(CreateDate));
+            set => SetPropertyValue(nameof(CreateDate), value);
         }
 
         /// <summary>
@@ -78,18 +58,8 @@ namespace EZNEW.Entity.Sys
         [EntityField(Description = "备注信息")]
         public string Remark
         {
-            get { return valueDict.GetValue<string>("Remark"); }
-            set { valueDict.SetValue("Remark", value); }
-        }
-
-        /// <summary>
-        /// 角色编号
-        /// </summary>
-        [EntityField(Description = "角色编号", PrimaryKey = true)]
-        public long Id
-        {
-            get { return valueDict.GetValue<long>("Id"); }
-            set { valueDict.SetValue("Id", value); }
+            get => GetPropertyValue<string>(nameof(Remark));
+            set => SetPropertyValue(nameof(Remark), value);
         }
     }
 }

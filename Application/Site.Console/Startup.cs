@@ -1,15 +1,14 @@
 using System;
-using AppConfig.IoC;
-using EZNEW.Web.Mvc;
-using EZNEW.Web.Mvc.Display;
-using EZNEW.Web.Mvc.Validation;
-using EZNEW.Web.Security.Authorization;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Site.Console.Config;
+using EZNEW.Web.Mvc;
+using EZNEW.Web.Mvc.Display;
+using EZNEW.Web.Mvc.Validation;
+using EZNEW.Web.Security.Authorization;
+using AppConfig.IoC;
 using Site.Console.Controllers;
 using Site.Console.Util;
 
