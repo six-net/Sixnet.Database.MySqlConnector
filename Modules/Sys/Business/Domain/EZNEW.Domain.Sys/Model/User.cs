@@ -229,13 +229,13 @@ namespace EZNEW.Domain.Sys.Model
             {
                 return Result.FailedResult("新密码为空");
             }
-            //加密密码
-            string newPassword = EncryptPassword(modifyUserPasswordParameter.NewPassword);
             //验证当前密码
-            if (modifyUserPasswordParameter.CheckCurrentPassword && Password != newPassword)
+            if (modifyUserPasswordParameter.CheckCurrentPassword && Password != EncryptPassword(modifyUserPasswordParameter.CurrentPassword))
             {
                 return Result.FailedResult("当前密码不正确");
             }
+            //加密密码
+            string newPassword = EncryptPassword(modifyUserPasswordParameter.NewPassword);
             Password = newPassword;
             return Result.SuccessResult("用户密码修改成功");
         }

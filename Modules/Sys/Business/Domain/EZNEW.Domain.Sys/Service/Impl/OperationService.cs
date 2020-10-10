@@ -49,8 +49,8 @@ namespace EZNEW.Domain.Sys.Service.Impl
             {
                 return Result.FailedResult("没有指定任何要删除的信息");
             }
-            IQuery delQuery = QueryManager.Create<OperationEntity>(c => operationIds.Contains(c.Id));
-            operationRepository.Remove(delQuery);
+            IQuery removeQuery = QueryManager.Create<OperationEntity>(c => operationIds.Contains(c.Id));
+            operationRepository.Remove(removeQuery);
             return Result.SuccessResult("删除成功");
         }
 
@@ -165,7 +165,7 @@ namespace EZNEW.Domain.Sys.Service.Impl
         {
             var operationPaging = operationRepository.GetPaging(query);
             var operationList = LoadOtherData(operationPaging, query);
-            return new DefaultPaging<Operation>(operationPaging.Page, operationPaging.PageSize, operationPaging.TotalCount, operationList);
+            return Pager.Create<Operation>(operationPaging.Page, operationPaging.PageSize, operationPaging.TotalCount, operationList);
         }
 
         /// <summary>

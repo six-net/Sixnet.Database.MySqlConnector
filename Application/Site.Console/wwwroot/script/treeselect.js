@@ -175,7 +175,6 @@ var CTreeSelect = function (options) {
 
     //关闭面板
     this.ClosePanel = function () {
-        console.log('close');
         thisObj.Container.removeClass('open');
         thisObj.Container.find('.ctreeselect-text-ico').removeClass('micon-up').addClass('micon-down');
     }
