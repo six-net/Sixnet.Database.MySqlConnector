@@ -20,6 +20,5 @@ namespace EZNEW.DataAccessContract.Sys
     /// </summary>
     public interface IUserDbAccess : IUserDataAccess
     {
-
     }
 }

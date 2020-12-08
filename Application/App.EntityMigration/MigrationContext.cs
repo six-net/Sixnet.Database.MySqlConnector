@@ -28,6 +28,12 @@ namespace App.EntityMigration
                 case DatabaseServerType.Oracle:
                     optionsBuilder.UseOracle(DatabaseServer.ConnectionString);
                     break;
+                case DatabaseServerType.PostgreSQL:
+                    optionsBuilder.UseNpgsql(DatabaseServer.ConnectionString);
+                    break;
+                case DatabaseServerType.SQLite:
+                    optionsBuilder.UseSqlite(DatabaseServer.ConnectionString);
+                    break;
             }
         }
 

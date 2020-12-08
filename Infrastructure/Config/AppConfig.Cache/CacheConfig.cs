@@ -13,10 +13,7 @@ namespace AppConfig.Cache
             {
                 return new List<CacheServer>()
                 {
-                    new CacheServer()
-                    {
-                        ServerType=CacheServerType.InMemory,
-                    }
+                    new CacheServer("inmemory",CacheServerType.InMemory)
                 };
             });
         }
