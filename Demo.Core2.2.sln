@@ -67,6 +67,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppConfig.Cache", "Infrastr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App.EntityMigration", "Application\App.EntityMigration\App.EntityMigration.csproj", "{FBCCCE7B-5962-4B0B-84E1-B5BDE6848609}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App.CodeBuilder", "Application\App.CodeBuilder\App.CodeBuilder.csproj", "{7DD8CF65-740A-472B-8C7C-7E33E5316955}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -153,6 +155,10 @@ Global
 		{FBCCCE7B-5962-4B0B-84E1-B5BDE6848609}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBCCCE7B-5962-4B0B-84E1-B5BDE6848609}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBCCCE7B-5962-4B0B-84E1-B5BDE6848609}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DD8CF65-740A-472B-8C7C-7E33E5316955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DD8CF65-740A-472B-8C7C-7E33E5316955}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DD8CF65-740A-472B-8C7C-7E33E5316955}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DD8CF65-740A-472B-8C7C-7E33E5316955}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -187,6 +193,7 @@ Global
 		{D365792B-26C1-44E3-A584-A9C1BDBF9F77} = {76242564-F8A8-4B23-9F8D-052D29A2670D}
 		{E391D70C-6BCC-426B-A80D-46EF4F687A9E} = {76242564-F8A8-4B23-9F8D-052D29A2670D}
 		{FBCCCE7B-5962-4B0B-84E1-B5BDE6848609} = {F991982F-A72A-415F-8E98-0F88098BA753}
+		{7DD8CF65-740A-472B-8C7C-7E33E5316955} = {F991982F-A72A-415F-8E98-0F88098BA753}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E71EE7CE-C126-4420-BE46-C80ACE2FF892}

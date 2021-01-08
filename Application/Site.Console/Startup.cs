@@ -26,7 +26,7 @@ namespace Site.Console
             {
                 options.ModelValidatorProviders.Add(new CustomDataAnnotationsModelValidatorProvider());
                 options.ModelMetadataDetailsProviders.Add(new CustomModelDisplayProvider());
-                options.Filters.Add<OperationAuthorizeFilter>();
+                options.Filters.Add<ExtendAuthorizeFilter>();
             })
             .AddViewOptions(vo =>
             {
