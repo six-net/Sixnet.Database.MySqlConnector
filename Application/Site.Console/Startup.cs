@@ -11,6 +11,10 @@ using EZNEW.Web.Security.Authorization;
 using AppConfig.IoC;
 using Site.Console.Controllers;
 using Site.Console.Util;
+using Site.Console.Filters;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using EZNEW.Diagnostics;
 
 namespace Site.Console
 {
@@ -22,11 +26,18 @@ namespace Site.Console
         {
             ContainerFactory.RegisterServices(services);
             services.AddHttpContextAccessor();
+            services.AddLogging(cfg =>
+            {
+                cfg.AddTraceSource("eznew", new DefaultTraceListener());
+                cfg.AddFilter("microsoft", LogLevel.Warning);
+            });
+            SwitchManager.EnableFrameworkTrace();
             services.AddMvc(options =>
             {
                 options.ModelValidatorProviders.Add(new CustomDataAnnotationsModelValidatorProvider());
                 options.ModelMetadataDetailsProviders.Add(new CustomModelDisplayProvider());
                 options.Filters.Add<ExtendAuthorizeFilter>();
+                options.Filters.Add<ConsoleExceptionFilter>();
             })
             .AddViewOptions(vo =>
             {

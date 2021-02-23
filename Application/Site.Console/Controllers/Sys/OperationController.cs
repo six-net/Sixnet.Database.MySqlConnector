@@ -269,7 +269,7 @@ namespace Site.Console.Controllers.Sys
 
         [AuthorizationAction(Name = "初始化默认操作功能")]
         [HttpPost]
-        public ActionResult ResolveDefaultAuthorizationAction()
+        public ActionResult ResolveDefaultAuthorizationOperation()
         {
             var operationGroups = AuthorizationManager.ResolveDefaultAuthorizations();
             if (!operationGroups.IsNullOrEmpty())
