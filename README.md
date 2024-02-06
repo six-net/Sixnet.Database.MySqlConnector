@@ -1,4 +1,4 @@
-# Sixnet.Database.MySQL
+# Sixnet.Database.MySqlConnector
 
 Provides access to MySQL databases based on the Sixnet development framework
 
