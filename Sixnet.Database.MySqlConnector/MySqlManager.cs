@@ -41,9 +41,9 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="server">Database server</param>
         /// <returns>Return database connection</returns>
-        public static IDbConnection GetConnection(DatabaseServer server)
+        public static IDbConnection GetConnection(SixnetDatabaseServer server)
         {
-            return DataManager.GetDatabaseConnection(server) ?? new MySqlConnection(server.ConnectionString);
+            return SixnetDataManager.GetDatabaseConnection(server) ?? new MySqlConnection(server.ConnectionString);
         }
 
         #endregion

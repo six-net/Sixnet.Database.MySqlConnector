@@ -9,7 +9,7 @@ namespace Sixnet.Database.MySqlConnector
     /// <summary>
     /// Defines bulk insertion options for mysql
     /// </summary>
-    public class MySqlBulkInsertionOptions : IBulkInsertionOptions
+    public class MySqlBulkInsertionOptions : ISixnetBulkInsertionOptions
     {
         /// <summary>
         /// Gets or sets the loader priority.

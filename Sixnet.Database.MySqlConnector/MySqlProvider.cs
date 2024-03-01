@@ -19,7 +19,7 @@ namespace Sixnet.Database.MySqlConnector
     /// <summary>
     /// Defines database provider implementation for mysql database(8.0+)
     /// </summary>
-    public class MySqlProvider : BaseDatabaseProvider
+    public class MySqlProvider : BaseSixnetDatabaseProvider
     {
         #region Constructor
 
@@ -37,7 +37,7 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="server">Database server</param>
         /// <returns></returns>
-        public override IDbConnection GetDbConnection(DatabaseServer server)
+        public override IDbConnection GetDbConnection(SixnetDatabaseServer server)
         {
             return MySqlManager.GetConnection(server);
         }
@@ -50,7 +50,7 @@ namespace Sixnet.Database.MySqlConnector
         /// Get data command resolver
         /// </summary>
         /// <returns></returns>
-        protected override IDataCommandResolver GetDataCommandResolver()
+        protected override ISixnetDataCommandResolver GetDataCommandResolver()
         {
             return MySqlManager.GetCommandResolver();
         }
@@ -77,7 +77,7 @@ namespace Sixnet.Database.MySqlConnector
         /// Bulk insert datas
         /// </summary>
         /// <param name="command">Database bulk insert command</param>
-        public override async Task BulkInsertAsync(DatabaseBulkInsertCommand command)
+        public override async Task BulkInsertAsync(BulkInsertDatabaseCommand command)
         {
             var dataTable = command.DataTable;
             if (dataTable == null)
@@ -91,7 +91,7 @@ namespace Sixnet.Database.MySqlConnector
             {
                 throw new SixnetException("Failed to generate temporary data file");
             }
-            dataFilePath = Path.Combine(ApplicationManager.RootPath, dataFilePath);
+            dataFilePath = Path.Combine(SixnetApplication.RootPath, dataFilePath);
             var loader = new MySqlBulkLoader(dbConnection)
             {
                 Local = true,
@@ -142,7 +142,7 @@ namespace Sixnet.Database.MySqlConnector
         /// Bulk insert datas
         /// </summary>
         /// <param name="command">Database bulk insert command</param>
-        public override void BulkInsert(DatabaseBulkInsertCommand command)
+        public override void BulkInsert(BulkInsertDatabaseCommand command)
         {
             var dataTable = command.DataTable;
             if (dataTable == null)
@@ -156,7 +156,7 @@ namespace Sixnet.Database.MySqlConnector
             {
                 throw new SixnetException("Failed to generate temporary data file");
             }
-            dataFilePath = Path.Combine(ApplicationManager.RootPath, dataFilePath);
+            dataFilePath = Path.Combine(SixnetApplication.RootPath, dataFilePath);
             var loader = new MySqlBulkLoader(dbConnection)
             {
                 Local = true,
@@ -272,9 +272,9 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="command">Command</param>
         /// <returns></returns>
-        public override List<DatabaseTableInfo> GetTables(DatabaseCommand command)
+        public override List<SixnetDataTable> GetTables(SixnetDatabaseCommand command)
         {
-            return command.Connection.DbConnection.Query<DatabaseTableInfo>(string.Format(queryDatabaseTablesScript, command.Connection.DbConnection.Database)).ToList();
+            return command.Connection.DbConnection.Query<SixnetDataTable>(string.Format(queryDatabaseTablesScript, command.Connection.DbConnection.Database)).ToList();
         }
 
         /// <summary>
@@ -282,9 +282,9 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="command">Command</param>
         /// <returns></returns>
-        public override async Task<List<DatabaseTableInfo>> GetTablesAsync(DatabaseCommand command)
+        public override async Task<List<SixnetDataTable>> GetTablesAsync(SixnetDatabaseCommand command)
         {
-            return (await command.Connection.DbConnection.QueryAsync<DatabaseTableInfo>(string.Format(queryDatabaseTablesScript, command.Connection.DbConnection.Database)).ConfigureAwait(false)).ToList();
+            return (await command.Connection.DbConnection.QueryAsync<SixnetDataTable>(string.Format(queryDatabaseTablesScript, command.Connection.DbConnection.Database)).ConfigureAwait(false)).ToList();
         }
 
         #endregion
