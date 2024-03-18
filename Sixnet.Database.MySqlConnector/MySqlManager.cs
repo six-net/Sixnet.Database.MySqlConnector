@@ -15,7 +15,7 @@ namespace Sixnet.Database.MySqlConnector
         /// <summary>
         /// Gets current database server type
         /// </summary>
-        internal const DatabaseServerType CurrentDatabaseServerType = DatabaseServerType.MySQL;
+        internal const DatabaseType CurrentDatabaseServerType = DatabaseType.MySQL;
 
         /// <summary>
         /// Key word prefix
@@ -41,7 +41,7 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="server">Database server</param>
         /// <returns>Return database connection</returns>
-        public static IDbConnection GetConnection(SixnetDatabaseServer server)
+        public static IDbConnection GetConnection(DatabaseServer server)
         {
             return SixnetDataManager.GetDatabaseConnection(server) ?? new MySqlConnection(server.ConnectionString);
         }

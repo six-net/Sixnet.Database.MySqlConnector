@@ -19,7 +19,7 @@ namespace Sixnet.Database.MySqlConnector
     /// <summary>
     /// Defines database provider implementation for mysql database(8.0+)
     /// </summary>
-    public class MySqlProvider : BaseSixnetDatabaseProvider
+    public class MySqlProvider : BaseDatabaseProvider
     {
         #region Constructor
 
@@ -37,7 +37,7 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="server">Database server</param>
         /// <returns></returns>
-        public override IDbConnection GetDbConnection(SixnetDatabaseServer server)
+        public override IDbConnection GetDbConnection(DatabaseServer server)
         {
             return MySqlManager.GetConnection(server);
         }
@@ -272,7 +272,7 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="command">Command</param>
         /// <returns></returns>
-        public override List<SixnetDataTable> GetTables(SixnetDatabaseCommand command)
+        public override List<SixnetDataTable> GetTables(DatabaseCommand command)
         {
             return command.Connection.DbConnection.Query<SixnetDataTable>(string.Format(queryDatabaseTablesScript, command.Connection.DbConnection.Database)).ToList();
         }
@@ -282,7 +282,7 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="command">Command</param>
         /// <returns></returns>
-        public override async Task<List<SixnetDataTable>> GetTablesAsync(SixnetDatabaseCommand command)
+        public override async Task<List<SixnetDataTable>> GetTablesAsync(DatabaseCommand command)
         {
             return (await command.Connection.DbConnection.QueryAsync<SixnetDataTable>(string.Format(queryDatabaseTablesScript, command.Connection.DbConnection.Database)).ConfigureAwait(false)).ToList();
         }
