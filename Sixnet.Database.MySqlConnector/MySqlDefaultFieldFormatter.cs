@@ -6,11 +6,11 @@ namespace Sixnet.Database.MySqlConnector
     /// <summary>
     /// Defines default field converter for mysql
     /// </summary>
-    internal class MySqlDefaultFieldFormatter : IFieldFormatter
+    internal class MySqlDefaultFieldFormatter : ISixnetFieldFormatter
     {
-        public string Format(FieldFormatContext context)
+        public string Format(FormatFieldContext context)
         {
-            var formatOption = context.FormatOption;
+            var formatOption = context.FormatSetting;
             var formatedFieldName = context.FieldName;
             formatedFieldName = formatOption.Name switch
             {
