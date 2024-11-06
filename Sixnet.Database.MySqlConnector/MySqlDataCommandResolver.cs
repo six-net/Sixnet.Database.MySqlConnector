@@ -183,7 +183,10 @@ namespace Sixnet.Database.MySqlConnector
                     {
                         autoIncrementField = field;
                     }
-                    continue;
+                    if (!SixnetDataManager.AllowInsertIncrementField(context.DataCommandExecutionContext.Command?.Options))
+                    {
+                        continue;
+                    }
                 }
                 // fields
                 insertFields.Add(WrapKeywordFunc(field.GetFieldName(DatabaseType)));

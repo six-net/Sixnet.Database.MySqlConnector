@@ -79,63 +79,70 @@ namespace Sixnet.Database.MySqlConnector
         /// <param name="command">Database bulk insert command</param>
         public override async Task BulkInsertAsync(BulkInsertDatabaseCommand command)
         {
-            var dataTable = command.DataTable;
-            if (dataTable == null)
+            try
             {
-                throw new ArgumentNullException(nameof(dataTable));
+                var dataTable = command.DataTable;
+                if (dataTable == null)
+                {
+                    throw new ArgumentNullException(nameof(dataTable));
+                }
+                var bulkInsertOptions = command.BulkInsertionOptions;
+                var dbConnection = command.Connection.DbConnection as MySqlConnection;
+                var dataFilePath = WriteTableToFile(dataTable, Path.Combine(Directory.GetCurrentDirectory(), "temp"), ignoreTitle: true);
+                if (string.IsNullOrWhiteSpace(dataFilePath))
+                {
+                    throw new SixnetException("Failed to generate temporary data file");
+                }
+                dataFilePath = Path.Combine(SixnetApplication.RootPath, dataFilePath);
+                var loader = new MySqlBulkLoader(dbConnection)
+                {
+                    Local = true,
+                    TableName = dataTable.TableName,
+                    FieldTerminator = CultureInfo.CurrentCulture.TextInfo.ListSeparator,
+                    LineTerminator = Environment.NewLine,
+                    FileName = dataFilePath,
+                    NumberOfLinesToSkip = 0
+                };
+                if (bulkInsertOptions is MySqlBulkInsertionOptions mySqlBulkInsertOptions)
+                {
+                    loader.Priority = mySqlBulkInsertOptions.Priority;
+                    loader.ConflictOption = mySqlBulkInsertOptions.ConflictOption;
+                    loader.EscapeCharacter = mySqlBulkInsertOptions.EscapeCharacter;
+                    loader.FieldQuotationOptional = mySqlBulkInsertOptions.FieldQuotationOptional;
+                    loader.FieldQuotationCharacter = mySqlBulkInsertOptions.FieldQuotationCharacter;
+                    loader.LineTerminator = mySqlBulkInsertOptions.LineTerminator;
+                    loader.FieldTerminator = mySqlBulkInsertOptions.FieldTerminator;
+                    if (!string.IsNullOrWhiteSpace(mySqlBulkInsertOptions.LinePrefix))
+                    {
+                        loader.LinePrefix = mySqlBulkInsertOptions.LinePrefix;
+                    }
+                    if (mySqlBulkInsertOptions.NumberOfLinesToSkip >= 0)
+                    {
+                        loader.NumberOfLinesToSkip = mySqlBulkInsertOptions.NumberOfLinesToSkip;
+                    }
+                    if (mySqlBulkInsertOptions.Columns.IsNullOrEmpty())
+                    {
+                        loader.Columns.AddRange(mySqlBulkInsertOptions.Columns);
+                    }
+                    if (mySqlBulkInsertOptions.Timeout > 0)
+                    {
+                        loader.Timeout = mySqlBulkInsertOptions.Timeout;
+                    }
+                    if (!string.IsNullOrWhiteSpace(mySqlBulkInsertOptions.CharacterSet))
+                    {
+                        loader.CharacterSet = mySqlBulkInsertOptions.CharacterSet;
+                    }
+                }
+                if (loader.Columns.IsNullOrEmpty())
+                {
+                    loader.Columns.AddRange(dataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                }
+                await loader.LoadAsync().ConfigureAwait(false);
             }
-            var bulkInsertOptions = command.BulkInsertionOptions;
-            var dbConnection = command.Connection.DbConnection as MySqlConnection;
-            var dataFilePath = WriteTableToFile(dataTable, Path.Combine(Directory.GetCurrentDirectory(), "temp"), ignoreTitle: true);
-            if (string.IsNullOrWhiteSpace(dataFilePath))
+            catch (Exception ex)
             {
-                throw new SixnetException("Failed to generate temporary data file");
+                throw GetSqlException(ex);
             }
-            dataFilePath = Path.Combine(SixnetApplication.RootPath, dataFilePath);
-            var loader = new MySqlBulkLoader(dbConnection)
-            {
-                Local = true,
-                TableName = dataTable.TableName,
-                FieldTerminator = CultureInfo.CurrentCulture.TextInfo.ListSeparator,
-                LineTerminator = Environment.NewLine,
-                FileName = dataFilePath,
-                NumberOfLinesToSkip = 0
-            };
-            if (bulkInsertOptions is MySqlBulkInsertionOptions mySqlBulkInsertOptions)
-            {
-                loader.Priority = mySqlBulkInsertOptions.Priority;
-                loader.ConflictOption = mySqlBulkInsertOptions.ConflictOption;
-                loader.EscapeCharacter = mySqlBulkInsertOptions.EscapeCharacter;
-                loader.FieldQuotationOptional = mySqlBulkInsertOptions.FieldQuotationOptional;
-                loader.FieldQuotationCharacter = mySqlBulkInsertOptions.FieldQuotationCharacter;
-                loader.LineTerminator = mySqlBulkInsertOptions.LineTerminator;
-                loader.FieldTerminator = mySqlBulkInsertOptions.FieldTerminator;
-                if (!string.IsNullOrWhiteSpace(mySqlBulkInsertOptions.LinePrefix))
-                {
-                    loader.LinePrefix = mySqlBulkInsertOptions.LinePrefix;
-                }
-                if (mySqlBulkInsertOptions.NumberOfLinesToSkip >= 0)
-                {
-                    loader.NumberOfLinesToSkip = mySqlBulkInsertOptions.NumberOfLinesToSkip;
-                }
-                if (mySqlBulkInsertOptions.Columns.IsNullOrEmpty())
-                {
-                    loader.Columns.AddRange(mySqlBulkInsertOptions.Columns);
-                }
-                if (mySqlBulkInsertOptions.Timeout > 0)
-                {
-                    loader.Timeout = mySqlBulkInsertOptions.Timeout;
-                }
-                if (!string.IsNullOrWhiteSpace(mySqlBulkInsertOptions.CharacterSet))
-                {
-                    loader.CharacterSet = mySqlBulkInsertOptions.CharacterSet;
-                }
-            }
-            if (loader.Columns.IsNullOrEmpty())
-            {
-                loader.Columns.AddRange(dataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
-            }
-            await loader.LoadAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -144,63 +151,70 @@ namespace Sixnet.Database.MySqlConnector
         /// <param name="command">Database bulk insert command</param>
         public override void BulkInsert(BulkInsertDatabaseCommand command)
         {
-            var dataTable = command.DataTable;
-            if (dataTable == null)
+            try
             {
-                throw new ArgumentNullException(nameof(dataTable));
+                var dataTable = command.DataTable;
+                if (dataTable == null)
+                {
+                    throw new ArgumentNullException(nameof(dataTable));
+                }
+                var bulkInsertOptions = command.BulkInsertionOptions;
+                var dbConnection = command.Connection.DbConnection as MySqlConnection;
+                var dataFilePath = WriteTableToFile(dataTable, Path.Combine(Directory.GetCurrentDirectory(), "temp"), ignoreTitle: true);
+                if (string.IsNullOrWhiteSpace(dataFilePath))
+                {
+                    throw new SixnetException("Failed to generate temporary data file");
+                }
+                dataFilePath = Path.Combine(SixnetApplication.RootPath, dataFilePath);
+                var loader = new MySqlBulkLoader(dbConnection)
+                {
+                    Local = true,
+                    TableName = dataTable.TableName,
+                    FieldTerminator = CultureInfo.CurrentCulture.TextInfo.ListSeparator,
+                    LineTerminator = Environment.NewLine,
+                    FileName = dataFilePath,
+                    NumberOfLinesToSkip = 0
+                };
+                if (bulkInsertOptions is MySqlBulkInsertionOptions mySqlBulkInsertOptions)
+                {
+                    loader.Priority = mySqlBulkInsertOptions.Priority;
+                    loader.ConflictOption = mySqlBulkInsertOptions.ConflictOption;
+                    loader.EscapeCharacter = mySqlBulkInsertOptions.EscapeCharacter;
+                    loader.FieldQuotationOptional = mySqlBulkInsertOptions.FieldQuotationOptional;
+                    loader.FieldQuotationCharacter = mySqlBulkInsertOptions.FieldQuotationCharacter;
+                    loader.LineTerminator = mySqlBulkInsertOptions.LineTerminator;
+                    loader.FieldTerminator = mySqlBulkInsertOptions.FieldTerminator;
+                    if (!string.IsNullOrWhiteSpace(mySqlBulkInsertOptions.LinePrefix))
+                    {
+                        loader.LinePrefix = mySqlBulkInsertOptions.LinePrefix;
+                    }
+                    if (mySqlBulkInsertOptions.NumberOfLinesToSkip >= 0)
+                    {
+                        loader.NumberOfLinesToSkip = mySqlBulkInsertOptions.NumberOfLinesToSkip;
+                    }
+                    if (mySqlBulkInsertOptions.Columns.IsNullOrEmpty())
+                    {
+                        loader.Columns.AddRange(mySqlBulkInsertOptions.Columns);
+                    }
+                    if (mySqlBulkInsertOptions.Timeout > 0)
+                    {
+                        loader.Timeout = mySqlBulkInsertOptions.Timeout;
+                    }
+                    if (!string.IsNullOrWhiteSpace(mySqlBulkInsertOptions.CharacterSet))
+                    {
+                        loader.CharacterSet = mySqlBulkInsertOptions.CharacterSet;
+                    }
+                }
+                if (loader.Columns.IsNullOrEmpty())
+                {
+                    loader.Columns.AddRange(dataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                }
+                loader.Load();
             }
-            var bulkInsertOptions = command.BulkInsertionOptions;
-            var dbConnection = command.Connection.DbConnection as MySqlConnection;
-            var dataFilePath = WriteTableToFile(dataTable, Path.Combine(Directory.GetCurrentDirectory(), "temp"), ignoreTitle: true);
-            if (string.IsNullOrWhiteSpace(dataFilePath))
+            catch (Exception ex)
             {
-                throw new SixnetException("Failed to generate temporary data file");
+                throw GetSqlException(ex);
             }
-            dataFilePath = Path.Combine(SixnetApplication.RootPath, dataFilePath);
-            var loader = new MySqlBulkLoader(dbConnection)
-            {
-                Local = true,
-                TableName = dataTable.TableName,
-                FieldTerminator = CultureInfo.CurrentCulture.TextInfo.ListSeparator,
-                LineTerminator = Environment.NewLine,
-                FileName = dataFilePath,
-                NumberOfLinesToSkip = 0
-            };
-            if (bulkInsertOptions is MySqlBulkInsertionOptions mySqlBulkInsertOptions)
-            {
-                loader.Priority = mySqlBulkInsertOptions.Priority;
-                loader.ConflictOption = mySqlBulkInsertOptions.ConflictOption;
-                loader.EscapeCharacter = mySqlBulkInsertOptions.EscapeCharacter;
-                loader.FieldQuotationOptional = mySqlBulkInsertOptions.FieldQuotationOptional;
-                loader.FieldQuotationCharacter = mySqlBulkInsertOptions.FieldQuotationCharacter;
-                loader.LineTerminator = mySqlBulkInsertOptions.LineTerminator;
-                loader.FieldTerminator = mySqlBulkInsertOptions.FieldTerminator;
-                if (!string.IsNullOrWhiteSpace(mySqlBulkInsertOptions.LinePrefix))
-                {
-                    loader.LinePrefix = mySqlBulkInsertOptions.LinePrefix;
-                }
-                if (mySqlBulkInsertOptions.NumberOfLinesToSkip >= 0)
-                {
-                    loader.NumberOfLinesToSkip = mySqlBulkInsertOptions.NumberOfLinesToSkip;
-                }
-                if (mySqlBulkInsertOptions.Columns.IsNullOrEmpty())
-                {
-                    loader.Columns.AddRange(mySqlBulkInsertOptions.Columns);
-                }
-                if (mySqlBulkInsertOptions.Timeout > 0)
-                {
-                    loader.Timeout = mySqlBulkInsertOptions.Timeout;
-                }
-                if (!string.IsNullOrWhiteSpace(mySqlBulkInsertOptions.CharacterSet))
-                {
-                    loader.CharacterSet = mySqlBulkInsertOptions.CharacterSet;
-                }
-            }
-            if (loader.Columns.IsNullOrEmpty())
-            {
-                loader.Columns.AddRange(dataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
-            }
-            loader.Load();
         }
 
         /// <summary>
@@ -285,6 +299,23 @@ namespace Sixnet.Database.MySqlConnector
         public override async Task<List<SixnetDataTable>> GetTablesAsync(DatabaseCommand command)
         {
             return (await command.Connection.DbConnection.QueryAsync<SixnetDataTable>(string.Format(queryDatabaseTablesScript, command.Connection.DbConnection.Database)).ConfigureAwait(false)).ToList();
+        }
+
+        #endregion
+
+        #region Get exception
+
+        protected override Exception GetSqlException(Exception ex)
+        {
+            if (ex is MySqlException sqlException)
+            {
+                switch (sqlException.Number)
+                {
+                    case 1062:
+                        return new SixnetSqlAlreadExistsException(sqlException.Message, sqlException);
+                }
+            }
+            return ex;
         }
 
         #endregion
