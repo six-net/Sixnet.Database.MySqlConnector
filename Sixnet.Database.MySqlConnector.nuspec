@@ -16,7 +16,7 @@
     <dependencies>
       <group targetFramework=".NETStandard2.1">
         <dependency id="MySqlConnector" version="2.1.5" />
-        <dependency id="Sixnet" version="2.1.0" />
+        <dependency id="Sixnet" version="2.1.1" />
       </group>
     </dependencies>
   </metadata>
