@@ -23,17 +23,17 @@ namespace Sixnet.Database.MySqlConnector
         /// <param name="translationResult">Queryable translation result</param>
         /// <param name="location">Queryable location</param>
         /// <returns></returns>
-        protected override async Task<QueryDatabaseStatement> GenerateQueryStatementCoreAsync(DataCommandResolveContext context, QueryableTranslationResult translationResult, QueryableLocation location)
+        protected override async Task<SixnetQueryDatabaseStatement> GenerateQueryStatementCoreAsync(SixnetDataCommandResolveContext context, SixnetQueryableTranslationResult translationResult, SixnetQueryableLocation location)
         {
             var queryable = translationResult.GetOriginalQueryable();
             string sqlStatement;
             IEnumerable<ISixnetField> outputFields = null;
             switch (queryable.ExecutionMode)
             {
-                case QueryableExecutionMode.Script:
+                case SixnetQueryableExecutionMode.Script:
                     sqlStatement = translationResult.GetCondition();
                     break;
-                case QueryableExecutionMode.Regular:
+                case SixnetQueryableExecutionMode.Regular:
                 default:
                     // table pet name
                     var tablePetName = context.GetTablePetName(queryable, queryable.GetModelType());
@@ -75,26 +75,32 @@ namespace Sixnet.Database.MySqlConnector
                     {
                         outputFields = SixnetDataManager.GetQueryableFields(DatabaseType, queryable.GetModelType(), queryable, context.IsRootQueryable(queryable));
                     }
-                    var outputFieldString = await FormatFieldsStringAsync(context, queryable, location, FieldLocation.Output, outputFields).ConfigureAwait(false);
+                    var outputFieldString = await FormatFieldsStringAsync(context, queryable, location, SixnetFieldLocation.Output, outputFields).ConfigureAwait(false);
                     //pre script
                     var preScript = GetPreScript(context, location);
                     //statement
                     sqlStatement = $"SELECT{GetDistinctString(queryable)} {outputFieldString} FROM {targetScript}{sort}{limit}";
                     switch (queryable.OutputType)
                     {
-                        case QueryableOutputType.Count:
+                        case SixnetQueryableOutputType.Count:
                             sqlStatement = hasCombine
-                                ? $"{preScript}SELECT COUNT(1) FROM (({sqlStatement}){combine}){TablePetNameKeyword}{tablePetName}"
+                                ? hasSort
+                                    ? $"{preScript}SELECT COUNT(1) FROM ((SELECT {tablePetName}.* FROM ({sqlStatement}){TablePetNameKeyword}{tablePetName}){combine}){TablePetNameKeyword}{tablePetName}"
+                                    : $"{preScript}SELECT COUNT(1) FROM (({sqlStatement}){combine}){TablePetNameKeyword}{tablePetName}"
                                 : $"{preScript}SELECT COUNT(1) FROM ({sqlStatement}){TablePetNameKeyword}{tablePetName}";
                             break;
-                        case QueryableOutputType.Predicate:
+                        case SixnetQueryableOutputType.Predicate:
                             sqlStatement = hasCombine
-                                ? $"{preScript}SELECT EXISTS(({sqlStatement}){combine})"
-                                : $"{preScript}SELECT EXISTS({sqlStatement})";
+                                ? hasSort
+                                    ? $"{preScript}SELECT 1 WHERE EXISTS((SELECT {tablePetName}.* FROM ({sqlStatement}){TablePetNameKeyword}{tablePetName}){combine})"
+                                    : $"{preScript}SELECT 1 WHERE EXISTS(({sqlStatement}){combine})"
+                                : $"{preScript}SELECT 1 WHERE EXISTS({sqlStatement})";
                             break;
                         default:
                             sqlStatement = hasCombine
-                            ? $"{preScript}({sqlStatement}){combine}"
+                            ? hasSort
+                                ? $"{preScript}(SELECT {tablePetName}.* FROM ({sqlStatement}){TablePetNameKeyword}{tablePetName}){combine}"
+                                : $"{preScript}({sqlStatement}){combine}"
                             : $"{preScript}{sqlStatement}";
                             break;
                     }
@@ -105,12 +111,12 @@ namespace Sixnet.Database.MySqlConnector
             var parameters = context.GetParameters();
 
             //log script
-            if (location == QueryableLocation.Top)
+            if (location == SixnetQueryableLocation.Top)
             {
                 LogScript(sqlStatement, parameters);
             }
 
-            return QueryDatabaseStatement.Create(sqlStatement, parameters, outputFields);
+            return SixnetQueryDatabaseStatement.Create(sqlStatement, parameters, outputFields);
         }
 
         #endregion
@@ -122,7 +128,7 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="context">Command resolve context</param>
         /// <returns></returns>
-        protected override async Task<List<ExecutionDatabaseStatement>> GenerateInsertStatementsAsync(DataCommandResolveContext context)
+        protected override async Task<List<SixnetExecutionDatabaseStatement>> GenerateInsertStatementsAsync(SixnetDataCommandResolveContext context)
         {
             var command = context.DataCommandExecutionContext.Command;
             var dataCommandExecutionContext = context.DataCommandExecutionContext;
@@ -131,32 +137,32 @@ namespace Sixnet.Database.MySqlConnector
             var fieldCount = fields.GetCount();
             var insertFields = new List<string>(fieldCount);
             var insertValues = new List<string>(fieldCount);
-            DataField autoIncrementField = null;
-            DataField splitField = null;
+            SixnetDataField autoIncrementField = null;
+            SixnetDataField splitField = null;
             dynamic splitValue = default;
 
             foreach (var field in fields)
             {
-                if (field.InRole(FieldRole.Increment))
+                if (field.InRole(SixnetFieldRole.Increment))
                 {
                     autoIncrementField ??= field;
-                    if (!autoIncrementField.InRole(FieldRole.PrimaryKey) && field.InRole(FieldRole.PrimaryKey)) // get first primary key field
+                    if (!autoIncrementField.InRole(SixnetFieldRole.PrimaryKey) && field.InRole(SixnetFieldRole.PrimaryKey)) // get first primary key field
                     {
                         autoIncrementField = field;
                     }
-                    if (!SixnetDataManager.AllowInsertIncrementField(context.DataCommandExecutionContext.Command?.Options))
+                    if (!SixnetDataManager.AllowInsertIncrementField(context.DataCommandExecutionContext))
                     {
                         continue;
                     }
                 }
                 // fields
-                insertFields.Add(WrapKeywordFunc(field.GetFieldName(DatabaseType)));
+                insertFields.Add(FormatAndWrapObjectName(SixnetDatabaseObjectName.Create(field.GetFieldName(DatabaseType), SixnetDatabaseObjectType.Column)));
                 // values
                 var insertValue = command.FieldsAssignment.GetNewValue(field.PropertyName);
                 insertValues.Add(await FormatInsertValueFieldAsync(context, command.Queryable, insertValue).ConfigureAwait(false));
 
                 // split value
-                if (field.InRole(FieldRole.SplitValue))
+                if (field.InRole(SixnetFieldRole.SplitValue))
                 {
                     splitValue = insertValue;
                     splitField = field;
@@ -175,7 +181,7 @@ namespace Sixnet.Database.MySqlConnector
             var incrScripts = new List<string>();
             foreach (var tableName in tableNames)
             {
-                statementBuilder.AppendLine($"INSERT INTO {WrapKeywordFunc(tableName)} ({string.Join(",", insertFields)}) VALUES ({string.Join(",", insertValues)});");
+                statementBuilder.AppendLine($"INSERT INTO {FormatAndWrapObjectName(tableName)} ({string.Join(",", insertFields)}) VALUES ({string.Join(",", insertValues)});");
             }
             if (autoIncrementField != null)
             {
@@ -184,9 +190,9 @@ namespace Sixnet.Database.MySqlConnector
                 statementBuilder.AppendLine($"SET {incrParameter} = LAST_INSERT_ID();");
                 incrScripts.Add($"{incrParameter} {ColumnPetNameKeyword} {incrField}");
             }
-            return new List<ExecutionDatabaseStatement>()
+            return new List<SixnetExecutionDatabaseStatement>()
             {
-                new ExecutionDatabaseStatement()
+                new SixnetExecutionDatabaseStatement()
                 {
                     Script = statementBuilder.ToString(),
                     ScriptType = GetCommandType(command),
@@ -206,7 +212,7 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="context">Command resolve context</param>
         /// <returns></returns>
-        protected override async Task<List<ExecutionDatabaseStatement>> GenerateUpdateStatementsAsync(DataCommandResolveContext context)
+        protected override async Task<List<SixnetExecutionDatabaseStatement>> GenerateUpdateStatementsAsync(SixnetDataCommandResolveContext context)
         {
             var command = context.DataCommandExecutionContext.Command;
             SixnetException.ThrowIf(command?.FieldsAssignment?.NewValues.IsNullOrEmpty() ?? true, "No set update field");
@@ -233,17 +239,17 @@ namespace Sixnet.Database.MySqlConnector
             {
                 var newValue = newValueItem.Value;
                 var propertyName = newValueItem.Key;
-                var updateField = SixnetDataManager.GetField(dataCommandExecutionContext.Server.DatabaseType, command.GetEntityType(), DataField.Create(propertyName)) as DataField;
+                var updateField = SixnetDataManager.GetField(dataCommandExecutionContext.Server.DatabaseType, command.GetEntityType(), SixnetDataField.Create(propertyName)) as SixnetDataField;
 
                 SixnetDirectThrower.ThrowSixnetExceptionIf(updateField == null, $"Not found field:{propertyName}");
 
-                var fieldFormattedName = WrapKeywordFunc(updateField.GetFieldName(DatabaseType));
+                var fieldFormattedName = FormatAndWrapObjectName(updateField.GetFieldName(DatabaseType), SixnetDatabaseObjectType.Column);
                 var newValueExpression = await FormatUpdateValueFieldAsync(context, command, newValue).ConfigureAwait(false);
                 updateSetArray.Add($"{tablePetName}.{fieldFormattedName}={newValueExpression}");
             }
 
             // parameters
-            var parameters = ConvertParameter(command.ScriptParameters) ?? new DataCommandParameters();
+            var parameters = ConvertParameter(command.ScriptParameters) ?? new SixnetDataCommandParameters();
             parameters.Union(context.GetParameters());
 
             // statement
@@ -257,11 +263,11 @@ namespace Sixnet.Database.MySqlConnector
                 var statementBuilder = new StringBuilder();
                 foreach (var tableName in tableNames)
                 {
-                    statementBuilder.AppendLine(string.Format(scriptTemplate, WrapKeywordFunc(tableName)));
+                    statementBuilder.AppendLine(string.Format(scriptTemplate, FormatAndWrapObjectName(tableName)));
                 }
-                return new List<ExecutionDatabaseStatement>(1)
+                return new List<SixnetExecutionDatabaseStatement>(1)
                 {
-                    new ExecutionDatabaseStatement()
+                    new SixnetExecutionDatabaseStatement()
                     {
                         Script = statementBuilder.ToString(),
                         ScriptType = scriptType,
@@ -273,16 +279,16 @@ namespace Sixnet.Database.MySqlConnector
             }
             else
             {
-                var queryStatement = await GenerateQueryStatementCoreAsync(context, translationResult, QueryableLocation.JoinTarget).ConfigureAwait(false);
+                var queryStatement = await GenerateQueryStatementCoreAsync(context, translationResult, SixnetQueryableLocation.JoinTarget).ConfigureAwait(false);
                 var updateTablePetName = "UTB";
                 var joinItems = FormatWrapJoinPrimaryKeys(context, command.Queryable, command.GetEntityType(), tablePetName, tablePetName, updateTablePetName);
                 scriptTemplate = $"{FormatPreScript(context)}UPDATE {{0}}{TablePetNameKeyword}{tablePetName} INNER JOIN ({queryStatement.Script}){TablePetNameKeyword}{updateTablePetName} ON {string.Join(" AND ", joinItems)} SET {string.Join(",", updateSetArray)};";
-                var statements = new List<ExecutionDatabaseStatement>(tableNames.Count);
+                var statements = new List<SixnetExecutionDatabaseStatement>(tableNames.Count);
                 foreach (var tableName in tableNames)
                 {
-                    statements.Add(new ExecutionDatabaseStatement()
+                    statements.Add(new SixnetExecutionDatabaseStatement()
                     {
-                        Script = string.Format(scriptTemplate, WrapKeywordFunc(tableName)),
+                        Script = string.Format(scriptTemplate, FormatAndWrapObjectName(tableName)),
                         ScriptType = scriptType,
                         MustAffectData = command.Options?.MustAffectData ?? false,
                         Parameters = parameters,
@@ -304,7 +310,7 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="context">Command resolve context</param>
         /// <returns></returns>
-        protected override async Task<List<ExecutionDatabaseStatement>> GenerateDeleteStatementsAsync(DataCommandResolveContext context)
+        protected override async Task<List<SixnetExecutionDatabaseStatement>> GenerateDeleteStatementsAsync(SixnetDataCommandResolveContext context)
         {
             var dataCommandExecutionContext = context.DataCommandExecutionContext;
             var command = dataCommandExecutionContext.Command;
@@ -324,7 +330,7 @@ namespace Sixnet.Database.MySqlConnector
             SixnetDirectThrower.ThrowInvalidOperationIf(tableNames.IsNullOrEmpty(), $"Get table name failed for {entityType.Name}");
 
             // parameters
-            var parameters = ConvertParameter(command.ScriptParameters) ?? new DataCommandParameters();
+            var parameters = ConvertParameter(command.ScriptParameters) ?? new SixnetDataCommandParameters();
             parameters.Union(context.GetParameters());
 
             // statement
@@ -338,11 +344,11 @@ namespace Sixnet.Database.MySqlConnector
                 var statementBuilder = new StringBuilder();
                 foreach (var tableName in tableNames)
                 {
-                    statementBuilder.AppendLine(string.Format(scriptTemplate, WrapKeywordFunc(tableName)));
+                    statementBuilder.AppendLine(string.Format(scriptTemplate, FormatAndWrapObjectName(tableName)));
                 }
-                return new List<ExecutionDatabaseStatement>(1)
+                return new List<SixnetExecutionDatabaseStatement>(1)
                 {
-                    new ExecutionDatabaseStatement()
+                    new SixnetExecutionDatabaseStatement()
                     {
                         Script = statementBuilder.ToString(),
                         ScriptType = scriptType,
@@ -354,16 +360,16 @@ namespace Sixnet.Database.MySqlConnector
             }
             else
             {
-                var queryStatement = await GenerateQueryStatementCoreAsync(context, translationResult, QueryableLocation.JoinTarget).ConfigureAwait(false);
+                var queryStatement = await GenerateQueryStatementCoreAsync(context, translationResult, SixnetQueryableLocation.JoinTarget).ConfigureAwait(false);
                 var updateTablePetName = "DTB";
                 var joinItems = FormatWrapJoinPrimaryKeys(context, command.Queryable, command.GetEntityType(), tablePetName, tablePetName, updateTablePetName);
                 scriptTemplate = $"{FormatPreScript(context)}DELETE {tablePetName} FROM {{0}}{TablePetNameKeyword}{tablePetName} INNER JOIN ({queryStatement.Script}){TablePetNameKeyword}{updateTablePetName} ON {string.Join(" AND ", joinItems)};";
-                var statements = new List<ExecutionDatabaseStatement>(tableNames.Count);
+                var statements = new List<SixnetExecutionDatabaseStatement>(tableNames.Count);
                 foreach (var tableName in tableNames)
                 {
-                    statements.Add(new ExecutionDatabaseStatement()
+                    statements.Add(new SixnetExecutionDatabaseStatement()
                     {
-                        Script = string.Format(scriptTemplate, WrapKeywordFunc(tableName)),
+                        Script = string.Format(scriptTemplate, FormatAndWrapObjectName(tableName)),
                         ScriptType = scriptType,
                         MustAffectData = command.Options?.MustAffectData ?? false,
                         Parameters = parameters,
@@ -374,65 +380,6 @@ namespace Sixnet.Database.MySqlConnector
             }
 
             #endregion
-        }
-
-        #endregion
-
-        #region Get create table statements
-
-        /// <summary>
-        /// Get create table statements
-        /// </summary>
-        /// <param name="migrationCommand">Migration command</param>
-        /// <returns></returns>
-        protected override async Task<List<ExecutionDatabaseStatement>> GetCreateTableStatementsAsync(MigrationDatabaseCommand migrationCommand)
-        {
-            var migrationInfo = migrationCommand.MigrationInfo;
-            if (migrationInfo?.NewTables.IsNullOrEmpty() ?? true)
-            {
-                return new List<ExecutionDatabaseStatement>(0);
-            }
-            var newTables = migrationInfo.NewTables;
-            var statements = new List<ExecutionDatabaseStatement>();
-            var options = migrationCommand.MigrationInfo;
-            foreach (var newTableInfo in newTables)
-            {
-                if (newTableInfo?.EntityType == null || (newTableInfo?.TableNames.IsNullOrEmpty() ?? true))
-                {
-                    continue;
-                }
-                var entityType = newTableInfo.EntityType;
-                var entityConfig = SixnetEntityManager.GetEntityConfig(entityType);
-                SixnetDirectThrower.ThrowSixnetExceptionIf(entityConfig == null, $"Get entity config failed for {entityType.Name}");
-
-                var newFieldScripts = new List<string>();
-                var primaryKeyNames = new List<string>();
-                foreach (var field in entityConfig.AllFields)
-                {
-                    var dataField = SixnetDataManager.GetField(MySqlManager.CurrentDatabaseServerType, entityType, field.Value);
-                    if (dataField is DataField dataEntityField)
-                    {
-                        var dataFieldName = MySqlManager.WrapKeyword(dataEntityField.GetFieldName(DatabaseType));
-                        newFieldScripts.Add($"{dataFieldName}{GetSqlDataType(dataEntityField, options)}{GetFieldNullable(dataEntityField, options)}{GetSqlDefaultValue(dataEntityField, options)}");
-                        if (dataEntityField.InRole(FieldRole.PrimaryKey))
-                        {
-                            primaryKeyNames.Add($"{dataFieldName}");
-                        }
-                    }
-                }
-                foreach (var tableName in newTableInfo.TableNames)
-                {
-                    var createTableStatement = new ExecutionDatabaseStatement()
-                    {
-                        Script = $"CREATE TABLE IF NOT EXISTS {tableName} ({string.Join(",", newFieldScripts)}{(primaryKeyNames.IsNullOrEmpty() ? "" : $", PRIMARY KEY ({string.Join(",", primaryKeyNames)}) USING BTREE")});"
-                    };
-                    statements.Add(createTableStatement);
-
-                    // Log script
-                    LogExecutionStatement(createTableStatement);
-                }
-            }
-            return await Task.FromResult(statements).ConfigureAwait(false);
         }
 
         #endregion
