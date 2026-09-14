@@ -6,7 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using MySqlConnector;
+
 using Sixnet.App;
 using Sixnet.Code;
 using Sixnet.Development.Data.Command;
@@ -19,13 +21,13 @@ namespace Sixnet.Database.MySqlConnector
     /// <summary>
     /// Defines database provider implementation for mysql database(8.0+)
     /// </summary>
-    public class MySqlProvider : SixnetBaseDatabaseProvider
+    public class SixnetMySqlProvider : SixnetBaseDatabaseProvider
     {
         #region Constructor
 
-        public MySqlProvider()
+        public SixnetMySqlProvider()
         {
-            queryTablesScript = "SELECT TABLE_NAME AS TableName FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='{0}' AND TABLE_TYPE='BASE TABLE';";
+            queryTablesScript = "SELECT TABLE_NAME AS Name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='{0}' AND TABLE_TYPE='BASE TABLE';";
         }
 
         #endregion
@@ -39,7 +41,7 @@ namespace Sixnet.Database.MySqlConnector
         /// <returns></returns>
         public override IDbConnection GetDbConnection(SixnetDatabaseServer server)
         {
-            return MySqlManager.GetConnection(server);
+            return SixnetMySqlManager.GetConnection(server);
         }
 
         /// <summary>
@@ -67,9 +69,9 @@ namespace Sixnet.Database.MySqlConnector
         /// Get data command resolver
         /// </summary>
         /// <returns></returns>
-        protected override ISixnetDataCommandResolver GetDataCommandResolver()
+        protected override ISixnetDataCommandResolver GetDataCommandResolver(SixnetDatabaseCommand command)
         {
-            return MySqlManager.GetCommandResolver();
+            return SixnetMySqlManager.GetCommandResolver();
         }
 
         #endregion
@@ -81,9 +83,9 @@ namespace Sixnet.Database.MySqlConnector
         /// </summary>
         /// <param name="parameters">Data command parameters</param>
         /// <returns></returns>
-        protected override DynamicParameters ConvertDataCommandParameters(SixnetDataCommandParameters parameters)
+        protected override DynamicParameters ConvertDataCommandParameters(SixnetDatabaseCommand command, SixnetDataCommandParameters parameters)
         {
-            return parameters?.ConvertToDynamicParameters(MySqlManager.GetCommandResolver().DatabaseType);
+            return parameters?.ConvertToDynamicParameters(SixnetMySqlManager.GetCommandResolver().DatabaseType);
         }
 
         #endregion
@@ -120,7 +122,7 @@ namespace Sixnet.Database.MySqlConnector
                     FileName = dataFilePath,
                     NumberOfLinesToSkip = 0
                 };
-                if (bulkInsertOptions is MySqlBulkInsertionOptions mySqlBulkInsertOptions)
+                if (bulkInsertOptions is SixnetMySqlBulkInsertionOptions mySqlBulkInsertOptions)
                 {
                     loader.Priority = mySqlBulkInsertOptions.Priority;
                     loader.ConflictOption = mySqlBulkInsertOptions.ConflictOption;
@@ -192,7 +194,7 @@ namespace Sixnet.Database.MySqlConnector
                     FileName = dataFilePath,
                     NumberOfLinesToSkip = 0
                 };
-                if (bulkInsertOptions is MySqlBulkInsertionOptions mySqlBulkInsertOptions)
+                if (bulkInsertOptions is SixnetMySqlBulkInsertionOptions mySqlBulkInsertOptions)
                 {
                     loader.Priority = mySqlBulkInsertOptions.Priority;
                     loader.ConflictOption = mySqlBulkInsertOptions.ConflictOption;
@@ -305,7 +307,7 @@ namespace Sixnet.Database.MySqlConnector
         /// <returns></returns>
         public override List<SixnetDataTable> GetTables(SixnetDatabaseCommand command)
         {
-            return command.Connection.DbConnection.Query<SixnetDataTable>(string.Format(queryTablesScript, command.Connection.DbConnection.Database)).ToList();
+            return command.Connection.DbConnection.Query<SixnetDataTable>(string.Format(queryTablesScript, command.Connection.DbConnection.Database), transaction: command.Connection?.Transaction?.DbTransaction).ToList();
         }
 
         /// <summary>
@@ -315,7 +317,7 @@ namespace Sixnet.Database.MySqlConnector
         /// <returns></returns>
         public override async Task<List<SixnetDataTable>> GetTablesAsync(SixnetDatabaseCommand command)
         {
-            return (await command.Connection.DbConnection.QueryAsync<SixnetDataTable>(string.Format(queryTablesScript, command.Connection.DbConnection.Database)).ConfigureAwait(false)).ToList();
+            return (await command.Connection.DbConnection.QueryAsync<SixnetDataTable>(string.Format(queryTablesScript, command.Connection.DbConnection.Database), transaction: command.Connection?.Transaction?.DbTransaction).ConfigureAwait(false)).ToList();
         }
 
         #endregion

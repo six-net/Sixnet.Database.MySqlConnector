@@ -8,7 +8,7 @@ namespace Sixnet.Database.MySqlConnector
     /// <summary>
     /// Defines default field converter for mysql
     /// </summary>
-    internal class MySqlDefaultFieldFormatter : ISixnetFieldFormatter
+    internal class SixnetMySqlDefaultFieldFormatter : ISixnetFieldFormatter
     {
         public string Format(SixnetFormatFieldContext context)
         {
@@ -76,6 +76,8 @@ namespace Sixnet.Database.MySqlConnector
                 SixnetFieldFormatterNames.MATH_TAN => $"TAN({formatedFieldName})",
                 SixnetFieldFormatterNames.STRING_INDEX_OF => StringIndexOf(formatedFieldName, formatOption.Parameter),
                 SixnetFieldFormatterNames.STRING_LAST_INDEX_OF => StringLastIndexOf(formatedFieldName, formatOption.Parameter),
+                SixnetFieldFormatterNames.EXISTS => $"EXISTS{formatedFieldName}",
+                SixnetFieldFormatterNames.NOT_EXISTS => $"NOT EXISTS{formatedFieldName}",
                 _ => throw new SixnetException($"{context.Server.DatabaseType} does not support field formatter: {formatOption.Name}"),
             };
 

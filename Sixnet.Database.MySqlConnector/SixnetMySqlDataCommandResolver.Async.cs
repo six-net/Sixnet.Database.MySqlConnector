@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Sixnet.Database.MySqlConnector
 {
-    internal partial class MySqlDataCommandResolver
+    internal partial class SixnetMySqlDataCommandResolver
     {
         #region Get query statement
 
@@ -28,7 +28,7 @@ namespace Sixnet.Database.MySqlConnector
             var queryable = translationResult.GetOriginalQueryable();
             string sqlStatement;
             IEnumerable<ISixnetField> outputFields = null;
-            switch (queryable.ExecutionMode)
+            switch (queryable.Info.ExecutionMode)
             {
                 case SixnetQueryableExecutionMode.Script:
                     sqlStatement = translationResult.GetCondition();
@@ -41,7 +41,7 @@ namespace Sixnet.Database.MySqlConnector
                     var sort = translationResult.GetSort();
                     var hasSort = !string.IsNullOrWhiteSpace(sort);
                     //limit
-                    var limit = GetLimitString(queryable.SkipCount, queryable.TakeCount, hasSort);
+                    var limit = GetLimitString(queryable.Info.SkipCount, queryable.Info.TakeCount, hasSort);
                     //combine
                     var combine = translationResult.GetCombine();
                     var hasCombine = !string.IsNullOrWhiteSpace(combine);
@@ -71,7 +71,7 @@ namespace Sixnet.Database.MySqlConnector
                     }
 
                     // output fields
-                    if (outputFields.IsNullOrEmpty() || !queryable.SelectedFields.IsNullOrEmpty())
+                    if (outputFields.IsNullOrEmpty() || !queryable.Info.SelectedFields.IsNullOrEmpty())
                     {
                         outputFields = SixnetDataManager.GetQueryableFields(DatabaseType, queryable.GetModelType(), queryable, context.IsRootQueryable(queryable));
                     }
@@ -80,7 +80,7 @@ namespace Sixnet.Database.MySqlConnector
                     var preScript = GetPreScript(context, location);
                     //statement
                     sqlStatement = $"SELECT{GetDistinctString(queryable)} {outputFieldString} FROM {targetScript}{sort}{limit}";
-                    switch (queryable.OutputType)
+                    switch (queryable.Info.OutputType)
                     {
                         case SixnetQueryableOutputType.Count:
                             sqlStatement = hasCombine
@@ -96,6 +96,14 @@ namespace Sixnet.Database.MySqlConnector
                                     : $"{preScript}SELECT 1 WHERE EXISTS(({sqlStatement}){combine})"
                                 : $"{preScript}SELECT 1 WHERE EXISTS({sqlStatement})";
                             break;
+                        case SixnetQueryableOutputType.TempTable:
+                            sqlStatement = hasCombine
+                            ? hasSort
+                                ? $"(SELECT {tablePetName}.* FROM ({sqlStatement}){TablePetNameKeyword}{tablePetName}){combine}"
+                                : $"({sqlStatement}){combine}"
+                            : $"{sqlStatement}";
+                            sqlStatement = $"{preScript}(CREATE TEMPORARY TABLE {queryable.Info.TempTableName} AS SELECT * FROM ({sqlStatement}))";
+                            break;
                         default:
                             sqlStatement = hasCombine
                             ? hasSort
@@ -110,13 +118,7 @@ namespace Sixnet.Database.MySqlConnector
             //parameters
             var parameters = context.GetParameters();
 
-            //log script
-            if (location == SixnetQueryableLocation.Top)
-            {
-                LogScript(sqlStatement, parameters);
-            }
-
-            return SixnetQueryDatabaseStatement.Create(sqlStatement, parameters, outputFields);
+            return SixnetQueryDatabaseStatement.Create(DatabaseType, location, sqlStatement, parameters, outputFields);
         }
 
         #endregion
@@ -192,14 +194,14 @@ namespace Sixnet.Database.MySqlConnector
             }
             return new List<SixnetExecutionDatabaseStatement>()
             {
-                new SixnetExecutionDatabaseStatement()
+                SixnetExecutionDatabaseStatement.Create(DatabaseType, data=>
                 {
-                    Script = statementBuilder.ToString(),
-                    ScriptType = GetCommandType(command),
-                    MustAffectData = command.Options?.MustAffectData ?? false,
-                    Parameters = context.GetParameters(),
-                    IncrScript = string.Join(",", incrScripts)
-                }
+                    data.Script = statementBuilder.ToString();
+                    data.ScriptType = GetCommandType(command);
+                    data.MustAffectData = command.Options?.MustAffectData ?? false;
+                    data.Parameters = context.GetParameters();
+                    data.IncrScript = string.Join(",", incrScripts);
+                })
             };
         }
 
@@ -267,14 +269,14 @@ namespace Sixnet.Database.MySqlConnector
                 }
                 return new List<SixnetExecutionDatabaseStatement>(1)
                 {
-                    new SixnetExecutionDatabaseStatement()
+                    SixnetExecutionDatabaseStatement.Create(DatabaseType, data =>
                     {
-                        Script = statementBuilder.ToString(),
-                        ScriptType = scriptType,
-                        MustAffectData = command.Options?.MustAffectData ?? false,
-                        Parameters = parameters,
-                        HasPreScript = false
-                    }
+                        data.Script = statementBuilder.ToString();
+                        data.ScriptType = scriptType;
+                        data.MustAffectData = command.Options?.MustAffectData ?? false;
+                        data.Parameters = parameters;
+                        data.HasPreScript = false;
+                    })
                 };
             }
             else
@@ -286,14 +288,14 @@ namespace Sixnet.Database.MySqlConnector
                 var statements = new List<SixnetExecutionDatabaseStatement>(tableNames.Count);
                 foreach (var tableName in tableNames)
                 {
-                    statements.Add(new SixnetExecutionDatabaseStatement()
+                    statements.Add(SixnetExecutionDatabaseStatement.Create(DatabaseType, data =>
                     {
-                        Script = string.Format(scriptTemplate, FormatAndWrapObjectName(tableName)),
-                        ScriptType = scriptType,
-                        MustAffectData = command.Options?.MustAffectData ?? false,
-                        Parameters = parameters,
-                        HasPreScript = true
-                    });
+                        data.Script = string.Format(scriptTemplate, FormatAndWrapObjectName(tableName));
+                        data.ScriptType = scriptType;
+                        data.MustAffectData = command.Options?.MustAffectData ?? false;
+                        data.Parameters = parameters;
+                        data.HasPreScript = true;
+                    }));
                 }
                 return statements;
             }
@@ -348,14 +350,14 @@ namespace Sixnet.Database.MySqlConnector
                 }
                 return new List<SixnetExecutionDatabaseStatement>(1)
                 {
-                    new SixnetExecutionDatabaseStatement()
+                    SixnetExecutionDatabaseStatement.Create(DatabaseType, data =>
                     {
-                        Script = statementBuilder.ToString(),
-                        ScriptType = scriptType,
-                        MustAffectData = command.Options?.MustAffectData ?? false,
-                        Parameters = parameters,
-                        HasPreScript = false
-                    }
+                        data.Script = statementBuilder.ToString();
+                        data.ScriptType = scriptType;
+                        data.MustAffectData = command.Options?.MustAffectData ?? false;
+                        data.Parameters = parameters;
+                        data.HasPreScript = false;
+                    })
                 };
             }
             else
@@ -367,14 +369,14 @@ namespace Sixnet.Database.MySqlConnector
                 var statements = new List<SixnetExecutionDatabaseStatement>(tableNames.Count);
                 foreach (var tableName in tableNames)
                 {
-                    statements.Add(new SixnetExecutionDatabaseStatement()
+                    statements.Add(SixnetExecutionDatabaseStatement.Create(DatabaseType, data =>
                     {
-                        Script = string.Format(scriptTemplate, FormatAndWrapObjectName(tableName)),
-                        ScriptType = scriptType,
-                        MustAffectData = command.Options?.MustAffectData ?? false,
-                        Parameters = parameters,
-                        HasPreScript = true
-                    });
+                        data.Script = string.Format(scriptTemplate, FormatAndWrapObjectName(tableName));
+                        data.ScriptType = scriptType;
+                        data.MustAffectData = command.Options?.MustAffectData ?? false;
+                        data.Parameters = parameters;
+                        data.HasPreScript = true;
+                    }));
                 }
                 return statements;
             }

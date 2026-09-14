@@ -1,5 +1,7 @@
 ﻿using System.Data;
+
 using MySqlConnector;
+
 using Sixnet.Development.Data;
 using Sixnet.Development.Data.Database;
 
@@ -8,14 +10,14 @@ namespace Sixnet.Database.MySqlConnector
     /// <summary>
     /// Defines mysql manager
     /// </summary>
-    internal static class MySqlManager
+    internal static class SixnetMySqlManager
     {
         #region Fields
 
         /// <summary>
         /// Default query translator
         /// </summary>
-        static readonly MySqlDataCommandResolver DefaultResolver = new MySqlDataCommandResolver();
+        static readonly SixnetMySqlDataCommandResolver DefaultResolver = new SixnetMySqlDataCommandResolver();
 
         #endregion
 
@@ -39,7 +41,7 @@ namespace Sixnet.Database.MySqlConnector
         /// Get command resolver
         /// </summary>
         /// <returns>Return a command resolver</returns>
-        internal static MySqlDataCommandResolver GetCommandResolver()
+        internal static SixnetMySqlDataCommandResolver GetCommandResolver()
         {
             return DefaultResolver;
         }
