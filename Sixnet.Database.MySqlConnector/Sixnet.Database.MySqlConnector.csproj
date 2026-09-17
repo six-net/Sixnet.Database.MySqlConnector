@@ -4,13 +4,28 @@
 		<TargetFrameworks>net6.0;net8.0;net10.0</TargetFrameworks>
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>sixnet.snk</AssemblyOriginatorKeyFile>
+		<Title>$(AssemblyName)</Title>
 		<Authors>DingBin.Li</Authors>
+		<Owners>DingBin.Li</Owners>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/sixnet-net</PackageProjectUrl>
 		<Copyright>Copyright © DingBin.Li</Copyright>
+		<PackageTags>.NET;Sixnet;MySQL</PackageTags>
+		<Description>Provides access to MySQL databases based on the Sixnet development framework</Description>
+		<PackageIcon>nugeticon.png</PackageIcon>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="MySqlConnector" Version="2.6.0" />
 		<PackageReference Include="Sixnet" Version="3.0.0" />
 	</ItemGroup>
-
+	
+	<ItemGroup>
+		<None Include="..\nugeticon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 </Project>
