@@ -540,7 +540,7 @@ SET @sql = IF(
           AND COLUMN_NAME = '{dataFieldName.Name}'
     ),
     'SELECT 1',
-    'ALTER TABLE {WrapObjectName(formattedTableName)} ADD COLUMN {WrapObjectName(dataFieldName).Name} {GetFieldDefinition(field, command.MigrationInfo)}'
+    'ALTER TABLE {WrapObjectName(formattedTableName)} ADD COLUMN {WrapObjectName(dataFieldName).Name} {GetFieldDefinition(table, field, command.MigrationInfo)}'
 );
 
 PREPARE stmt FROM @sql;
@@ -621,7 +621,7 @@ SET @sql = IF(
           AND TABLE_NAME = '{formattedTableName.Name}'
           AND COLUMN_NAME = '{nowFormatedFieldName.Name}'
     ),
-    'ALTER TABLE {WrapObjectName(formattedTableName)} MODIFY COLUMN {WrapObjectName(nowFormatedFieldName).Name} {GetFieldDefinition(field, command.MigrationInfo)}',
+    'ALTER TABLE {WrapObjectName(formattedTableName)} MODIFY COLUMN {WrapObjectName(nowFormatedFieldName).Name} {GetFieldDefinition(table, field, command.MigrationInfo)}',
     'SELECT 1'
 );
 
